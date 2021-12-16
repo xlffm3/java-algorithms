@@ -8,57 +8,54 @@ import java.util.Collections;
 import java.util.List;
 
 public class Main {
-
-    private static int clusterCounts = 0;
-    private static int n;
-    private static int[][] graph;
-    private static boolean[][] visited;
-    private static int[] vertical = {-1, 1, 0, 0};
-    private static int[] horizontal = {0, 0, -1, 1};
+    private static final int[] DIRECTION_X = {1, -1, 0, 0};
+    private static final int[] DIRECTION_Y = {0, 0, 1, -1};
+    private static int houseCounts = 0;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        n = Integer.parseInt(br.readLine());
-        graph = new int[n][n];
-        visited = new boolean[n][n];
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(bufferedReader.readLine());
+        int[][] map = new int[n][n];
+        boolean[][] visited = new boolean[n][n];
 
         for (int i = 0; i < n; i++) {
-            char[] inputArray = br.readLine().toCharArray();
-            for (int j = 0; j < n; j++) {
-                graph[i][j] = inputArray[j] - '0';
+            char[] inputArray = bufferedReader.readLine().toCharArray();
+            for (int j = 0; j < inputArray.length; j++) {
+                map[i][j] = inputArray[j] - '0';
+                visited[i][j] = false;
             }
         }
 
-        List<Integer> houseCountsPerCluster = new ArrayList<>();
+        List<Integer> houseCountsPerChunk = new ArrayList<>();
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (graph[i][j] == 1 && !visited[i][j]) {
-                    clusterCounts = 1;
-                    dfs(i, j);
-                    houseCountsPerCluster.add(clusterCounts);
+                if (map[i][j] == 1 && !visited[i][j]) {
+                    houseCounts = 1;
+                    dfs(n, i, j, map, visited);
+                    houseCountsPerChunk.add(houseCounts);
                 }
             }
         }
 
-        Collections.sort(houseCountsPerCluster);
-        System.out.println(houseCountsPerCluster.size());
-        houseCountsPerCluster.forEach(System.out::println);
+        Collections.sort(houseCountsPerChunk);
+        System.out.println(houseCountsPerChunk.size());
+        houseCountsPerChunk.forEach(System.out::println);
 
-        br.close();
+        bufferedReader.close();
     }
 
-    private static void dfs(int x, int y) {
+    private static void dfs(int n, int x, int y, int[][] map, boolean[][] visited) {
         visited[x][y] = true;
 
         for (int i = 0; i < 4; i++) {
-            int nextX = x + vertical[i];
-            int nextY = y + horizontal[i];
+            int nextX = x + DIRECTION_X[i];
+            int nextY = y + DIRECTION_Y[i];
 
-            if (nextX >= 0 && nextY >= 0 && nextX < n && nextY < n) {
-                if (graph[nextX][nextY] == 1 && !visited[nextX][nextY]) {
-                    dfs(nextX, nextY);
-                    clusterCounts++;
+            if (nextX >= 0 && nextX < n && nextY >= 0 && nextY < n) {
+                if (map[nextX][nextY] == 1 && !visited[nextX][nextY]) {
+                    dfs(n, nextX, nextY, map, visited);
+                    houseCounts++;
                 }
             }
         }
